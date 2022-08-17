@@ -7,18 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ro.vlad.androidtest.R
 import ro.vlad.androidtest.adapters.UsersAdapter
 import ro.vlad.androidtest.models.UserModel
-import ro.vlad.androidtest.utils.UsersBuilder
-import ro.vlad.androidtest.utils.UsersInterface
 import ro.vlad.androidtest.utils.UsersUtil
 
 
@@ -28,9 +22,11 @@ class HomeFragment : Fragment() {
 
     private var recyclerViewAdapter: UsersAdapter? = null
     private var linearLayoutManager: LinearLayoutManager? = null
-    private var progressBar: ProgressBar ? = null
+    private var progressBar: ProgressBar? = null
 
-    var usersList: ArrayList<UserModel.Result> = ArrayList()
+    private var usersList: ArrayList<UserModel.Result> = ArrayList()
+
+    private var page = 0
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,7 +38,6 @@ class HomeFragment : Fragment() {
         populateData()
         initScrollListener()
     }
-
 
 
     private fun populateData() {
@@ -80,8 +75,14 @@ class HomeFragment : Fragment() {
 
                 //check if it's the last element
                 if (linearLayoutManager?.findLastCompletelyVisibleItemPosition() == usersList.size - 1) {
-                    loadMore()
-                    progressBar?.visibility = View.VISIBLE
+                    if (page < 3) {
+                        loadMore()
+                        progressBar?.visibility = View.VISIBLE
+
+
+                    } else {
+                        Log.d("STATUS", "Page 3 has been reached")
+                    }
                 }
             }
         })
@@ -92,12 +93,14 @@ class HomeFragment : Fragment() {
         Log.d("STATUS", "Loading more users")
 
         context?.let {
+            page++
             UsersUtil(it).fetchFromRemote { list ->
                 usersList.addAll(list)
                 recyclerViewAdapter?.notifyDataSetChanged()
                 progressBar?.visibility = View.GONE
             }
         }
+
     }
 
 
