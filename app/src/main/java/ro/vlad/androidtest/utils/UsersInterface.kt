@@ -6,7 +6,7 @@ import retrofit2.http.GET
 
 interface UsersInterface {
 
-    @GET("/api/?page=0&results=20&seed=abc")
+    @GET("/api/?page=0&results=20")
     fun getUsers(
     ): Call<UserModel>
 
